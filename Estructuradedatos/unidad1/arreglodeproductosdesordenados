@@ -1,0 +1,118 @@
+import java.util.*;
+
+class Producto implements Comparable<Producto> {
+    private String codigo;
+    private String nombre;
+    private double precio;
+    private int cantidad;
+    
+    public Producto(String codigo, String nombre, double precio, int cantidad) {
+        this.codigo = codigo;
+        this.nombre = nombre;
+        this.precio = precio;
+        this.cantidad = cantidad;
+    }
+    
+    public String getCodigo() { return codigo; }
+    public String getNombre() { return nombre; }
+    public double getPrecio() { return precio; }
+    public int getCantidad() { return cantidad; }
+    
+    public void setPrecio(double precio) { this.precio = precio; }
+    public void setCantidad(int cantidad) { this.cantidad = cantidad; }
+    
+    @Override
+    public int compareTo(Producto otro) {
+        return Double.compare(this.precio, otro.precio);
+    }
+    
+    public static Comparator<Producto> compararPorCantidad = Comparator.comparingInt(Producto::getCantidad);
+    
+    @Override
+    public String toString() {
+        return "Codigo: " + codigo + ", Nombre: " + nombre + ", Precio: " + precio + ", Cantidad: " + cantidad;
+    }
+}
+
+class GestorProductos {
+    private List<Producto> productos;
+    
+    public GestorProductos() {
+        productos = new ArrayList<>(10);
+    }
+    
+    public void agregarProducto(Producto producto) {
+        if (productos.size() < 10) {
+            productos.add(producto);
+        } else {
+            System.out.println("No se pueden agregar más productos, la lista está llena.");
+        }
+    }
+    
+    public void ordenarPorCodigo() {
+        productos.sort(Comparator.comparing(Producto::getCodigo));
+    }
+    
+    public Producto buscarPorCodigo(String codigo) {
+        ordenarPorCodigo();
+        int izquierda = 0, derecha = productos.size() - 1;
+        while (izquierda <= derecha) {
+            int medio = izquierda + (derecha - izquierda) / 2;
+            int comparacion = productos.get(medio).getCodigo().compareTo(codigo);
+            if (comparacion == 0) {
+                return productos.get(medio);
+            } else if (comparacion < 0) {
+                izquierda = medio + 1;
+            } else {
+                derecha = medio - 1;
+            }
+        } 
+        return null;
+    }
+    
+    public void ordenarPorPrecio() {
+        Collections.sort(productos);
+    }
+    
+    public void ordenarPorCantidad() {
+        productos.sort(Producto.compararPorCantidad);
+    }
+    
+    public void mostrarProductos() {
+        for (Producto p : productos) {
+            System.out.println(p);
+        }
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        GestorProductos gestor = new GestorProductos();
+        
+        gestor.agregarProducto(new Producto("001", "Laptop", 1200.50, 10));
+        gestor.agregarProducto(new Producto("002", "Mouse", 25.75, 50));
+        gestor.agregarProducto(new Producto("003", "Teclado", 45.00, 30));
+        gestor.agregarProducto(new Producto("004", "Monitor", 250.00, 15));
+        gestor.agregarProducto(new Producto("005", "Impresora", 150.00, 5));
+        gestor.agregarProducto(new Producto("006", "Disco Duro", 80.00, 20));
+        gestor.agregarProducto(new Producto("007", "Memoria USB", 15.00, 100));
+        gestor.agregarProducto(new Producto("008", "Fuente de Poder", 60.00, 12));
+        gestor.agregarProducto(new Producto("009", "Tarjeta Gráfica", 500.00, 8));
+        gestor.agregarProducto(new Producto("010", "Caja de PC", 90.00, 7));
+        
+        System.out.println("Lista de productos inicial:");
+        gestor.mostrarProductos();
+        
+        System.out.println("\nOrdenando por precio:");
+        gestor.ordenarPorPrecio();
+        gestor.mostrarProductos();
+        
+        System.out.println("\nOrdenando por cantidad:");
+        gestor.ordenarPorCantidad();
+        gestor.mostrarProductos();
+        
+        System.out.println("\nBuscando producto con código '002':");
+        Producto encontrado = gestor.buscarPorCodigo("002");
+        System.out.println(encontrado != null ? encontrado : "Producto no encontrado");
+    }
+}
